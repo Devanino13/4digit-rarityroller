@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲 Algorithmic Rarity Roller</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0e1117; color: #ffffff; max-width: 600px; margin: 40px auto; padding: 20px; }
+        .card { background: #1a1c23; border-radius: 10px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center; }
+        input { font-size: 24px; width: 120px; text-align: center; background: #262730; border: 1px solid #464855; color: white; padding: 10px; border-radius: 5px; margin-right: 10px; }
+        button { font-size: 18px; padding: 12px 20px; background: #ff4b4b; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #e03e3e; }
+        .results { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .metric { background: #262730; padding: 15px; border-radius: 8px; }
+        .metric h3 { margin: 0; font-size: 14px; color: #a3a8b4; }
+        .metric div { font-size: 28px; font-weight: bold; margin-top: 5px; }
+        .breakdown { margin-top: 25px; text-align: left; background: #262730; padding: 15px; border-radius: 8px; font-size: 14px; }
+        .breakdown ul { margin: 5px 0 0 0; padding-left: 20px; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🎲 Algorithmic Rarity Roller</h2>
+        <p>Type a 4-digit number or spin the wheel to evaluate its rarity.</p>
+        <div style="margin: 20px 0;">
+            <input type="text" id="numInput" maxlength="4" value="7777" oninput="runEngine()">
+            <button onclick="rollRandom()">🎲 Roll Random</button>
+        </div>
+        <div class="results">
+            <div class="metric">
+                <h3>Hidden Rarity Tally</h3>
+                <div id="scoreBox">0 / 100</div>
+            </div>
+            <div class="metric">
+                <h3>Rarity Class</h3>
+                <div id="tierBox" style="color: purple;">🔮 MYTHIC</div>
+            </div>
+        </div>
+        <div class="breakdown">
+            <strong>🛠️ Points Breakdown Analysis:</strong>
+            <ul id="breakdownList"></ul>
+        </div>
+    </div>
+    <script>
+        function runEngine() {
+            let numStr = document.getElementById("numInput").value;
+            if (numStr.length !== 4 || isNaN(numStr)) {
+                document.getElementById("scoreBox").innerText = "----";
+                document.getElementById("tierBox").innerText = "❌ Invalid";
+                document.getElementById("tierBox").style.color = "red";
+                document.getElementById("breakdownList").innerHTML = "<li>Please enter exactly 4 digits.</li>";
+                return;
+            }
+            let score = 0;
+            let breakdown = [];
+            let uniqueDigits = new Set(numStr).size;
+            if (uniqueDigits === 4) { score += 35; breakdown.push("Chaotic Multiplicity (4 unique digits): +35 pts"); }
+            else if (uniqueDigits === 3) { score += 20; breakdown.push("Standard Doublet (3 unique digits): +20 pts"); }
+            else if (uniqueDigits === 2) { score += 15; breakdown.push("Heavy Compression (2 unique digits): +15 pts"); }
+            else if (uniqueDigits === 1) { score += 50; breakdown.push("Singularity Anomaly (All digits match!): +50 pts"); }
+            if ("0123456789".includes(numStr) || "9876543210".includes(numStr)) {
+                score += 40; breakdown.push("Perfect Numerical Staircase: +40 pts");
+            }
+            if (numStr.substring(0,2) === numStr.substring(2,4)) {
+                score += 25; breakdown.push("Echo Echo Pattern (Symmetrical split): +25 pts");
+            }
+            if (numStr === numStr.split('').reverse().join('') && uniqueDigits > 1) {
+                score += 20; breakdown.push("Mirror Mirror (Palindrome layout): +20 pts");
+            }
+            let sevens = (numStr.match(/7/g) || []).length;
+            if (sevens > 0) {
+                score += sevens * 5; breakdown.push(`Lucky Seven Influence (+5 per '7'): +${sevens * 5} pts`);
+            }
+            if (/^[01]+\$/.test(numStr)) {
+                score += 15; breakdown.push("Binary Matrix Sequence: +15 pts");
+            }
+            score = Math.min(score, 100);
+            let tier, color;
+            if (score >= 98) { tier = "🔮 MYTHIC"; color = "#d946ef"; }
+            else if (score >= 85) { tier = "👑 LEGENDARY"; color = "#f97316"; }
+            else if (score >= 70) { tier = "✨ SPECIAL"; color = "#22c55e"; }
+            else if (score >= 55) { tier = "💎 SUPER RARE"; color = "#3b82f6"; }
+            else if (score >= 45) { tier = "⭐ RARE"; color = "#e2e8f0"; }
+            else if (score >= 36) { tier = "⚙️ UNCOMMON"; color = "#94a3b8"; }
+            else { tier = "🗑️ COMMON"; color = "#64748b"; }
+            document.getElementById("scoreBox").innerText = `${score} / 100`;
+            document.getElementById("tierBox").innerText = tier;
+            document.getElementById("tierBox").style.color = color;
+            let listHtml = breakdown.map(item => `<li>${item}</li>`).join('');
+            document.getElementById("breakdownList").innerHTML = listHtml || "<li>No notable structural patterns detected.</li>";
+        }
+        function rollRandom() {
+            let rand = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            document.getElementById("numInput").value = rand;
+            runEngine();
+        }
+        runEngine();
+    </script>
+</body>
+</html>
